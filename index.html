@@ -63,7 +63,7 @@
 </head>
 <body>
 
-  <img src="Parul_University_LOGO-removebg-preview.png" alt="Logo" class="logo">
+  <img src="Parul_University_LOGO-removebg-preview.png" alt="Logo" class="logo" />
   <h1>Student Dashboard</h1>
 
   <div class="admin-login" onclick="window.location.href='admin.html'">Admin Login</div>
@@ -73,30 +73,46 @@
   <table id="studentTable" style="display: none;"></table>
 
   <div class="footer">
-    Created by <strong>Akash Patil</strong> and Guided by <strong>Mohit Kumar Rathod</strong>
+    Created by <strong>Akash Patil</strong> and Guided by <strong> Prof.Mohit Kumar Rathod</strong>
   </div>
 
   <script>
     let studentData = [];
 
-    // ✅ Replace this with your actual published Google Sheet CSV URL
+    // Replace with your published Google Sheet CSV URL
     const SHEET_URL = "YOUR_CSV_URL_HERE";
 
     async function fetchData() {
-      const res = await fetch(SHEET_URL);
-      const text = await res.text();
-      const rows = text.trim().split('\n').map(row => row.split(','));
+      try {
+        const res = await fetch(SHEET_URL);
+        if (!res.ok) throw new Error("Failed to fetch sheet data");
+        const text = await res.text();
+        const rows = text.trim().split('\n').map(row => row.split(','));
 
-      const headers = rows[0];
-      const data = rows.slice(1).map(row =>
-        Object.fromEntries(row.map((val, i) => [headers[i], val]))
-      );
+        const headers = rows[0];
+        const data = rows.slice(1).map(row =>
+          Object.fromEntries(row.map((val, i) => [headers[i], val]))
+        );
 
-      studentData = data;
+        studentData = data;
+      } catch (err) {
+        console.error("Error loading data:", err);
+      }
+    }
+
+    function escapeHTML(str) {
+      if (!str) return "";
+      return str.replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
     }
 
     function searchStudent() {
-      const enroll = document.getElementById("enrollInput").value.trim();
+      let enroll = document.getElementById("enrollInput").value.trim();
+      // sanitize input: only alphanumeric allowed
+      enroll = enroll.replace(/[^a-zA-Z0-9]/g, "");
       const table = document.getElementById("studentTable");
 
       if (!enroll) {
@@ -114,7 +130,7 @@
 
       let html = "";
       for (let key in student) {
-        html += `<tr><th>${key}</th><td>${student[key]}</td></tr>`;
+        html += `<tr><th>${escapeHTML(key)}</th><td>${escapeHTML(student[key])}</td></tr>`;
       }
 
       table.innerHTML = html;
@@ -123,9 +139,9 @@
 
     fetchData();
   </script>
+
 </body>
 </html>
-
 
 
 :
