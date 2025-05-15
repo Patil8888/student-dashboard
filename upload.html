@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload Excel File</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Upload Student Excel File</h1>
+    <form id="uploadForm">
+      <input type="file" id="excelFile" accept=".xlsx" required><br><br>
+      <button type="submit">Upload</button>
+    </form>
+    <p id="uploadMsg" style="color: lime; margin-top: 10px;"></p>
+  </div>
+
+  <script>
+    const uploadForm = document.getElementById('uploadForm');
+    const msg = document.getElementById('uploadMsg');
+
+    uploadForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const fileInput = document.getElementById('excelFile');
+      const file = fileInput.files[0];
+
+      if (file) {
+        msg.textContent = `File "${file.name}" uploaded (simulated). You can now process it.`;
+        // Note: You'd handle this with a backend server if storing or processing the file permanently.
+      } else {
+        msg.textContent = "Please select a file.";
+      }
+    });
+  </script>
+</body>
+</html>
+
