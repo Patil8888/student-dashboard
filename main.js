@@ -1,39 +1,36 @@
-window.onload = function() {
+window.onload = function () {
   Tabletop.init({
-    key: 'YOUR_GOOGLE_SHEET_ID',  // Replace this with your Google Sheet ID
-    callback: function(data, tabletop) {
-      console.log(data);  // You can see the data structure in the console
-      window.studentData = data;  // Store the data globally for later use
-    },
+    key: 'your-google-sheet-key', // Replace with your actual Google Sheet key
+    callback: showData,
     simpleSheet: true
   });
+};
 
-  // Handle form submission
-  const form = document.getElementById('enrollmentForm');
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();  // Prevent the default form submission
+function showData(data) {
+  const enrollmentForm = document.getElementById('enrollmentForm');
+  const studentDataDiv = document.getElementById('studentData');
+
+  enrollmentForm.addEventListener('submit', function (e) {
+    e.preventDefault();
 
     const enrollmentNumber = document.getElementById('enrollmentNumber').value;
-    
-    // Filter student data based on enrollment number
-    const student = window.studentData.find(s => s['Enrollment No'] == enrollmentNumber);
-    
+    const student = data.find(student => student.enrollment_number === enrollmentNumber);
+
     if (student) {
-      // Display student data
-      document.getElementById('studentData').innerHTML = `
-        <h3>Student Information</h3>
-        <table class="table">
-          <tr><th>Name</th><td>${student.Name}</td></tr>
-          <tr><th>Subject</th><td>${student.Subject}</td></tr>
-          <tr><th>Grade</th><td>${student.Grade}</td></tr>
-          <tr><th>Attendance (%)</th><td>${student['Attendance (%)']}</td></tr>
+      const studentInfo = `
+        <table>
+          <tr><th>Enrollment Number</th><td>${student.enrollment_number}</td></tr>
+          <tr><th>Name</th><td>${student.name}</td></tr>
+          <tr><th>Course</th><td>${student.course}</td></tr>
+          <tr><th>Year</th><td>${student.year}</td></tr>
         </table>
       `;
+      studentDataDiv.innerHTML = studentInfo;
     } else {
-      // If no data found
-      document.getElementById('studentData').innerHTML = '<p>No data found for this enrollment number.</p>';
+      studentDataDiv.innerHTML = '<p>No student found with this enrollment number.</p>';
     }
   });
-};
+}
+
 
 
