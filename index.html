@@ -2,82 +2,130 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Student Dashboard</title>
-  <link rel="stylesheet" href="styles.css">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
-      background-color: #000;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: start;
-      min-height: 100vh;
-      padding-top: 40px;
-    }
-
-    .container {
+      background-color: black;
+      color: white;
+      font-family: Arial, sans-serif;
       text-align: center;
-      max-width: 600px;
-      width: 100%;
+      margin: 0;
+      padding: 20px;
     }
 
     .logo {
-      width: 300px; /* 50% bigger than 200px */
-      margin-bottom: 20px;
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 30px;
-    }
-
-    #enrollmentForm {
+      width: 300px;
       margin-top: 20px;
     }
 
-    #studentData {
-      margin-top: 40px;
-      background-color: #111;
-      padding: 20px;
-      border-radius: 10px;
+    h1 {
+      margin: 10px 0;
+      font-size: 2.5rem;
     }
 
-    .btn-warning {
-      margin-bottom: 20px;
+    input {
+      padding: 10px;
+      font-size: 1rem;
+      margin-top: 20px;
+      width: 300px;
+      border-radius: 5px;
+      border: none;
+    }
+
+    table {
+      width: 90%;
+      margin: 20px auto;
+      border-collapse: collapse;
+      background-color: #222;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #444;
+    }
+
+    .admin-login {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      color: #ffc107;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .footer {
+      margin-top: 40px;
+      color: #aaa;
+      font-size: 1rem;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Logo -->
-    <img src="Parul_University_LOGO-removebg-preview.png" alt="Parul University Logo" class="logo">
 
-    <!-- Admin Login Button -->
-    <div>
-      <a href="admin.html" class="btn btn-warning">Login for Administrator</a>
-    </div>
+  <img src="Parul_University_LOGO-removebg-preview.png" alt="Logo" class="logo">
+  <h1>Student Dashboard</h1>
 
-    <!-- Heading -->
-    <h1>Student Dashboard</h1>
+  <div class="admin-login" onclick="window.location.href='admin.html'">Admin Login</div>
 
-    <!-- Search Form -->
-    <form id="enrollmentForm" class="mb-4">
-      <label for="enrollmentNumber" class="form-label">Enter Enrollment Number:</label>
-      <input type="text" id="enrollmentNumber" class="form-control" placeholder="Enter your Enrollment Number" required>
-      <button type="submit" class="btn btn-primary mt-3">Submit</button>
-    </form>
+  <input type="text" id="enrollInput" placeholder="Enter Enrollment Number" onkeyup="searchStudent()" />
 
-    <!-- Result Display -->
-    <div id="studentData" class="mt-5"></div>
+  <table id="studentTable" style="display: none;"></table>
+
+  <div class="footer">
+    Created by <strong>Akash Patil</strong> and Guided by <strong>Mohit Kumar Rathod</strong>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/tabletop@1.6.0/tabletop.js"></script>
-  <script src="main.js"></script>
+  <script>
+    let studentData = [];
+
+    // ✅ Replace this with your actual published Google Sheet CSV URL
+    const SHEET_URL = "YOUR_CSV_URL_HERE";
+
+    async function fetchData() {
+      const res = await fetch(SHEET_URL);
+      const text = await res.text();
+      const rows = text.trim().split('\n').map(row => row.split(','));
+
+      const headers = rows[0];
+      const data = rows.slice(1).map(row =>
+        Object.fromEntries(row.map((val, i) => [headers[i], val]))
+      );
+
+      studentData = data;
+    }
+
+    function searchStudent() {
+      const enroll = document.getElementById("enrollInput").value.trim();
+      const table = document.getElementById("studentTable");
+
+      if (!enroll) {
+        table.style.display = "none";
+        return;
+      }
+
+      const student = studentData.find(s => s["Enrollment Number"] === enroll);
+
+      if (!student) {
+        table.innerHTML = "<tr><td>No student found</td></tr>";
+        table.style.display = "table";
+        return;
+      }
+
+      let html = "";
+      for (let key in student) {
+        html += `<tr><th>${key}</th><td>${student[key]}</td></tr>`;
+      }
+
+      table.innerHTML = html;
+      table.style.display = "table";
+    }
+
+    fetchData();
+  </script>
 </body>
 </html>
+
 
 
 :
