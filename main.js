@@ -1,36 +1,53 @@
-window.onload = function () {
-  Tabletop.init({
-    key: 'your-google-sheet-key', // Replace with your actual Google Sheet key
-    callback: showData,
-    simpleSheet: true
-  });
+
+let studentData = [];
+
+window.onload = function() {
+  // Load data from localStorage if exists
+  const dataStr = localStorage.getItem('studentData');
+  if (dataStr) {
+    try {
+      studentData = JSON.parse(dataStr);
+    } catch (e) {
+      console.error("Error parsing student data from localStorage:", e);
+      studentData = [];
+    }
+  }
 };
 
-function showData(data) {
-  const enrollmentForm = document.getElementById('enrollmentForm');
-  const studentDataDiv = document.getElementById('studentData');
-
-  enrollmentForm.addEventListener('submit', function (e) {
-    e.preventDefault();
-
-    const enrollmentNumber = document.getElementById('enrollmentNumber').value;
-    const student = data.find(student => student.enrollment_number === enrollmentNumber);
-
-    if (student) {
-      const studentInfo = `
-        <table>
-          <tr><th>Enrollment Number</th><td>${student.enrollment_number}</td></tr>
-          <tr><th>Name</th><td>${student.name}</td></tr>
-          <tr><th>Course</th><td>${student.course}</td></tr>
-          <tr><th>Year</th><td>${student.year}</td></tr>
-        </table>
-      `;
-      studentDataDiv.innerHTML = studentInfo;
-    } else {
-      studentDataDiv.innerHTML = '<p>No student found with this enrollment number.</p>';
-    }
-  });
+function sanitize(str) {
+  // Convert to lowercase and trim whitespace for case-insensitive search
+  return str ? str.toString().toLowerCase().trim() : "";
 }
+
+function searchStudent() {
+  const enrollmentInput = document.getElementById("enrollment").value;
+  const ugInput = document.getElementById("ugnumber").value;
+
+  const sanitizedEnroll = sanitize(enrollmentInput);
+  const sanitizedUG = sanitize(ugInput);
+
+  // Find the student by Enrollment Number or UG Number
+  const found = studentData.find(student => {
+    // Adjust property names based on your dataset
+    const studentEnroll = sanitize(student.EnrollmentNumber);
+    const studentUG = sanitize(student.UGNumber);
+    return studentEnroll === sanitizedEnroll || studentUG === sanitizedUG;
+  });
+
+  const infoDiv = document.getElementById("student-info");
+  if (found) {
+    let html = "<h2>Student Details:</h2><ul>";
+    for (let key in found) {
+      // Format property names nicely if needed
+      html += `<li><strong>${key}:</strong> ${found[key]}</li>`;
+    }
+    html += "</ul>";
+    infoDiv.innerHTML = html;
+  } else {
+    infoDiv.innerHTML = "<p>No student found. Check your entry and try again.</p>";
+  }
+}
+
 
 
 
