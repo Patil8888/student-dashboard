@@ -2,84 +2,74 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Administrator Login</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>Admin Panel</title>
   <style>
     body {
-      background-color: #000;
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-
-    .login-container {
-      background-color: #111;
-      padding: 40px;
-      border-radius: 10px;
-      text-align: center;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 0 10px #444;
-    }
-
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: none;
-      border-radius: 5px;
-      background-color: #333;
+      background-color: #121212;
       color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
     }
-
-    button {
-      width: 100%;
+    input, button {
+      margin: 10px;
       padding: 10px;
-      border: none;
-      border-radius: 5px;
-      background-color: #ffc107;
-      color: #000;
-      font-weight: bold;
-      cursor: pointer;
+      width: 300px;
+      font-size: 1rem;
     }
-
-    button:hover {
-      background-color: #e0a800;
-    }
-
-    .error {
-      color: red;
-      margin-top: 10px;
+    .hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <div class="login-container">
-    <h2>Admin Login</h2>
-    <form id="loginForm">
-      <input type="text" id="username" placeholder="Username" required>
-      <input type="password" id="password" placeholder="Password" required>
-      <button type="submit">Login</button>
-      <div class="error" id="errorMsg"></div>
-    </form>
+  <h1>Administrator Login</h1>
+
+  <div id="loginDiv">
+    <input type="text" id="username" placeholder="Username (9978524578)" /><br>
+    <input type="password" id="password" placeholder="Password" /><br>
+    <button onclick="login()">Login</button>
   </div>
 
-  <script>
-    document.getElementById("loginForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const errorMsg = document.getElementById("errorMsg");
+  <div id="uploadDiv" class="hidden">
+    <h2>Upload XLSX File</h2>
+    <input type="file" id="fileInput" accept=".xlsx" /><br>
+    <button onclick="processFile()">Upload</button>
+  </div>
 
-      if (username === "9978524578" && password === "Password") {
-        window.location.href = "upload.html";
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <script>
+    function login() {
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+      if (user === "9978524578" && pass === "Password") {
+        document.getElementById("loginDiv").classList.add("hidden");
+        document.getElementById("uploadDiv").classList.remove("hidden");
       } else {
-        errorMsg.textContent = "Invalid username or password!";
+        alert("Invalid credentials!");
       }
-    });
+    }
+
+    function processFile() {
+      const file = document.getElementById("fileInput").files[0];
+      if (!file) {
+        alert("Please upload a valid .xlsx file.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+
+        localStorage.setItem("studentData", JSON.stringify(jsonData));
+        alert("File uploaded and data saved locally!");
+        window.location.href = "index.html";
+      };
+      reader.readAsArrayBuffer(file);
+    }
   </script>
 </body>
 </html>
