@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Student Dashboard</title>
   <style>
     body {
@@ -10,130 +11,102 @@
       font-family: Arial, sans-serif;
       text-align: center;
       margin: 0;
-      padding: 20px;
+      padding: 0;
     }
-
+    h1 {
+      margin-top: 20px;
+      font-size: 2em;
+    }
     .logo {
-      width: 450px;
+      width: 200px;
       margin-top: 20px;
     }
-
-    h1 {
-      margin: 10px 0;
-      font-size: 2.5rem;
+    .search-container {
+      margin-top: 30px;
     }
-
     input {
       padding: 10px;
-      font-size: 1rem;
-      margin: 10px;
       width: 300px;
+      margin: 10px;
+      font-size: 16px;
       border-radius: 5px;
       border: none;
     }
-
-    table {
-      width: 90%;
-      margin: 20px auto;
-      border-collapse: collapse;
-      background-color: #222;
+    #student-info {
+      margin-top: 30px;
+      font-size: 18px;
+      color: #00ff00;
     }
-
-    th, td {
-      padding: 10px;
-      border: 1px solid #444;
-    }
-
-    .admin-login {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      color: #ffc107;
-      font-weight: bold;
-      cursor: pointer;
-      text-decoration: underline;
-    }
-
-    .footer {
-      margin-top: 40px;
-      color: #aaa;
-      font-size: 1rem;
+    footer {
+      margin-top: 60px;
+      font-size: 14px;
+      color: gray;
     }
   </style>
 </head>
 <body>
-
-  <img src="Parul_University_LOGO-removebg-preview.png" alt="Logo" class="logo" />
+  <img class="logo" src="Parul_University_LOGO-removebg-preview.png" alt="Logo">
   <h1>Student Dashboard</h1>
 
-  <div class="admin-login" onclick="window.location.href='admin.html'">Admin Login</div>
-
-  <input type="text" id="enrollInput" placeholder="Enter Enrollment Number" onkeyup="searchStudent()" />
-  <input type="text" id="ugInput" placeholder="Or Enter UG Number" onkeyup="searchStudent()" />
-
-  <table id="studentTable" style="display: none;"></table>
-
-  <div class="footer">
-    Created by <strong>Akash Patil</strong> and Guided by <strong>Mohit Kumar Rathod</strong>
+  <div class="search-container">
+    <input type="text" id="enrollment" placeholder="Enter Enrollment Number">
+    <br>
+    <input type="text" id="ugnumber" placeholder="Or Enter UG Number">
+    <br>
+    <button onclick="searchStudent()">Search</button>
   </div>
+
+  <div id="student-info"></div>
+
+  <footer>
+    Created by Akash Patil and Guided by Mohit Kumar Rathod
+  </footer>
 
   <script>
     let studentData = [];
 
-    function escapeHTML(str) {
-      if (!str) return "";
-      return str.replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#39;");
+    async function fetchData() {
+      try {
+        const response = await fetch("student_data.json");
+        studentData = await response.json();
+      } catch (error) {
+        console.error("Error loading student data:", error);
+      }
     }
 
-    function fetchData() {
-      try {
-        const stored = localStorage.getItem('studentData');
-        if (stored) {
-          studentData = JSON.parse(stored);
-        }
-      } catch (err) {
-        console.error("Error loading local data:", err);
-      }
+    function sanitize(input) {
+      return input.replace(/[^a-zA-Z0-9]/g, "").trim().toLowerCase();
     }
 
     function searchStudent() {
-      let enroll = document.getElementById("enrollInput").value.trim().replace(/[^a-zA-Z0-9]/g, "");
-      let ug = document.getElementById("ugInput").value.trim().replace(/[^a-zA-Z0-9]/g, "");
-      const table = document.getElementById("studentTable");
+      const enrollmentInput = document.getElementById("enrollment").value;
+      const ugInput = document.getElementById("ugnumber").value;
 
-      if (!enroll && !ug) {
-        table.style.display = "none";
-        return;
+      const sanitizedEnroll = sanitize(enrollmentInput);
+      const sanitizedUG = sanitize(ugInput);
+
+      const found = studentData.find(student => {
+        return sanitize(student.EnrollmentNumber || "") === sanitizedEnroll ||
+               sanitize(student.UGNumber || "") === sanitizedUG;
+      });
+
+      const infoDiv = document.getElementById("student-info");
+
+      if (found) {
+        let html = "<h2>Student Details:</h2><ul>";
+        for (let key in found) {
+          html += `<li><strong>${key}:</strong> ${found[key]}</li>`;
+        }
+        html += "</ul>";
+        infoDiv.innerHTML = html;
+      } else {
+        infoDiv.innerHTML = "<p>No student found. Check your entry and try again.</p>";
       }
-
-      const student = studentData.find(s =>
-        s["Enrollment Number"] === enroll || s["UG Number"] === ug
-      );
-
-      if (!student) {
-        table.innerHTML = "<tr><td>No student found</td></tr>";
-        table.style.display = "table";
-        return;
-      }
-
-      let html = "";
-      for (let key in student) {
-        html += `<tr><th>${escapeHTML(key)}</th><td>${escapeHTML(student[key])}</td></tr>`;
-      }
-
-      table.innerHTML = html;
-      table.style.display = "table";
     }
 
-    fetchData();
+    window.onload = fetchData;
   </script>
-
 </body>
 </html>
-
 
 
