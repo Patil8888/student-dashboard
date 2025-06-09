@@ -14,7 +14,7 @@
     }
 
     .logo {
-      width: 300px;
+      width: 450px;
       margin-top: 20px;
     }
 
@@ -26,7 +26,7 @@
     input {
       padding: 10px;
       font-size: 1rem;
-      margin-top: 20px;
+      margin: 10px;
       width: 300px;
       border-radius: 5px;
       border: none;
@@ -69,36 +69,16 @@
   <div class="admin-login" onclick="window.location.href='admin.html'">Admin Login</div>
 
   <input type="text" id="enrollInput" placeholder="Enter Enrollment Number" onkeyup="searchStudent()" />
+  <input type="text" id="ugInput" placeholder="Or Enter UG Number" onkeyup="searchStudent()" />
 
   <table id="studentTable" style="display: none;"></table>
 
   <div class="footer">
-    Created by <strong>Akash Patil</strong> and Guided by Ms.Sumitra Menaria,<strong> Prof.Mohit Kumar Rathod</strong>
+    Created by <strong>Akash Patil</strong> and Guided by <strong>Mohit Kumar Rathod</strong>
   </div>
 
   <script>
     let studentData = [];
-
-    // Replace with your published Google Sheet CSV URL
-    const SHEET_URL = "YOUR_CSV_URL_HERE";
-
-    async function fetchData() {
-      try {
-        const res = await fetch(SHEET_URL);
-        if (!res.ok) throw new Error("Failed to fetch sheet data");
-        const text = await res.text();
-        const rows = text.trim().split('\n').map(row => row.split(','));
-
-        const headers = rows[0];
-        const data = rows.slice(1).map(row =>
-          Object.fromEntries(row.map((val, i) => [headers[i], val]))
-        );
-
-        studentData = data;
-      } catch (err) {
-        console.error("Error loading data:", err);
-      }
-    }
 
     function escapeHTML(str) {
       if (!str) return "";
@@ -109,18 +89,30 @@
                 .replace(/'/g, "&#39;");
     }
 
+    function fetchData() {
+      try {
+        const stored = localStorage.getItem('studentData');
+        if (stored) {
+          studentData = JSON.parse(stored);
+        }
+      } catch (err) {
+        console.error("Error loading local data:", err);
+      }
+    }
+
     function searchStudent() {
-      let enroll = document.getElementById("enrollInput").value.trim();
-      // sanitize input: only alphanumeric allowed
-      enroll = enroll.replace(/[^a-zA-Z0-9]/g, "");
+      let enroll = document.getElementById("enrollInput").value.trim().replace(/[^a-zA-Z0-9]/g, "");
+      let ug = document.getElementById("ugInput").value.trim().replace(/[^a-zA-Z0-9]/g, "");
       const table = document.getElementById("studentTable");
 
-      if (!enroll) {
+      if (!enroll && !ug) {
         table.style.display = "none";
         return;
       }
 
-      const student = studentData.find(s => s["Enrollment Number"] === enroll);
+      const student = studentData.find(s =>
+        s["Enrollment Number"] === enroll || s["UG Number"] === ug
+      );
 
       if (!student) {
         table.innerHTML = "<tr><td>No student found</td></tr>";
@@ -144,4 +136,4 @@
 </html>
 
 
-:
+
