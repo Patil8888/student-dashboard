@@ -1,37 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Upload Excel File</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<style>
-  body { background: black; color: white; font-family: Arial; text-align: center; padding: 50px; }
-  input { margin: 20px; padding: 10px; width: 250px; }
-</style>
-</head>
-<body>
-  <h1>Upload .xlsx File</h1>
-  <input type="file" id="xlsx-file" accept=".xlsx"><br>
-
-  <script>
-    document.getElementById("xlsx-file").addEventListener("change", function(e) {
-      const file = e.target.files[0];
-      if (!file) return alert("No file selected");
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        const data = new Uint8Array(event.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const ws = workbook.Sheets[workbook.SheetNames[0]];
-        const arr = XLSX.utils.sheet_to_json(ws, { defval: "" });
-        localStorage.setItem("studentData", JSON.stringify(arr));
-        alert("Upload successful! Redirecting...");
-        window.location.href = "index.html";
-      };
-      reader.readAsArrayBuffer(file);
-    });
-  </script>
+<html>
+<head><title>Upload XLSX</title></head>
+<body style="background:black; color:white; text-align:center; padding-top:100px;">
+  <h1>Upload Student File</h1>
+  <form action="/upload" method="POST" enctype="multipart/form-data">
+    <input type="file" name="file" accept=".xlsx" required><br><br>
+    <button type="submit">Upload</button>
+  </form>
 </body>
 </html>
+
 
 
 
