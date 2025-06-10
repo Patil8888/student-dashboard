@@ -1,112 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Student Dashboard</title>
-  <style>
-    body {
-      background-color: black;
-      color: white;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin: 0;
-      padding: 0;
-    }
-    h1 {
-      margin-top: 20px;
-      font-size: 2em;
-    }
-    .logo {
-      width: 200px;
-      margin-top: 20px;
-    }
-    .search-container {
-      margin-top: 30px;
-    }
-    input {
-      padding: 10px;
-      width: 300px;
-      margin: 10px;
-      font-size: 16px;
-      border-radius: 5px;
-      border: none;
-    }
-    #student-info {
-      margin-top: 30px;
-      font-size: 18px;
-      color: #00ff00;
-    }
-    footer {
-      margin-top: 60px;
-      font-size: 14px;
-      color: gray;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Student Dashboard</title>
+<style>
+  body { background: black; color: white; font-family: Arial; text-align: center; padding: 30px; }
+  .logo { width: 300px; margin: auto; display: block; }
+  input, button { margin: 10px; padding: 10px; width: 250px; }
+  #student-info { margin-top: 30px; font-size: 16px; text-align: left; display: inline-block; }
+</style>
 </head>
 <body>
-  <img class="logo" src="Parul_University_LOGO-removebg-preview.png" alt="Logo">
+  <img src="Parul_University_LOGO-removebg-preview.png" class="logo"><br>
   <h1>Student Dashboard</h1>
-
-  <div class="search-container">
-    <input type="text" id="enrollment" placeholder="Enter Enrollment Number">
-    <br>
-    <input type="text" id="ugnumber" placeholder="Or Enter UG Number">
-    <br>
-    <button onclick="searchStudent()">Search</button>
-  </div>
+  <input type="text" id="enroll" placeholder="Enter Enrollment Number"><br>
+  <input type="text" id="ug" placeholder="Enter UG Number"><br>
+  <button onclick="search()">Search</button>
 
   <div id="student-info"></div>
-
-  <footer>
-    Created by Akash Patil and Guided by Mohit Kumar Rathod
-  </footer>
+  <footer style="margin-top:40px;">Created by Akash Patil &amp; Guided by Mohit Kumar Rathod</footer>
 
   <script>
-    let studentData = [];
+    const studentData = JSON.parse(localStorage.getItem("studentData") || "[]");
+    function sanitize(s) { return (s||"").toString().trim().replace(/\s+/g," ").toLowerCase(); }
 
-    async function fetchData() {
-      try {
-        const response = await fetch("student_data.json");
-        studentData = await response.json();
-      } catch (error) {
-        console.error("Error loading student data:", error);
-      }
-    }
+    function search() {
+      const en = sanitize(document.getElementById("enroll").value);
+      const ug = sanitize(document.getElementById("ug").value);
+      const result = studentData.find(r =>
+        sanitize(r["ENROLLMENT NO."] || r["EnrollmentNumber"] || "") === en ||
+        sanitize(r["UG Number"] || r["UGNumber"] || "") === ug
+      );
 
-    function sanitize(input) {
-      return input.replace(/[^a-zA-Z0-9]/g, "").trim().toLowerCase();
-    }
-
-    function searchStudent() {
-      const enrollmentInput = document.getElementById("enrollment").value;
-      const ugInput = document.getElementById("ugnumber").value;
-
-      const sanitizedEnroll = sanitize(enrollmentInput);
-      const sanitizedUG = sanitize(ugInput);
-
-      const found = studentData.find(student => {
-        return sanitize(student.EnrollmentNumber || "") === sanitizedEnroll ||
-               sanitize(student.UGNumber || "") === sanitizedUG;
-      });
-
-      const infoDiv = document.getElementById("student-info");
-
-      if (found) {
-        let html = "<h2>Student Details:</h2><ul>";
-        for (let key in found) {
-          html += `<li><strong>${key}:</strong> ${found[key]}</li>`;
-        }
-        html += "</ul>";
-        infoDiv.innerHTML = html;
+      const out = document.getElementById("student-info");
+      if (result) {
+        out.innerHTML = "<h2>Details:</h2><ul>" + 
+          Object.entries(result)
+          .map(([k,v]) => `<li><b>${k}:</b> ${v}</li>`).join("") +
+          "</ul>";
       } else {
-        infoDiv.innerHTML = "<p>No student found. Check your entry and try again.</p>";
+        out.textContent = "No student found.";
       }
     }
-
-    window.onload = fetchData;
   </script>
 </body>
 </html>
+
 
 
