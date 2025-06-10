@@ -1,14 +1,28 @@
 <!DOCTYPE html>
 <html>
-<head><title>Student Dashboard</title></head>
+<head>
+  <title>Student Dashboard</title>
+</head>
 <body style="background:black; color:white; text-align:center; padding:30px;">
+
+  <!-- Admin Login Button -->
+  <button onclick="window.location.href='login.html'" style="position: absolute; top: 20px; right: 20px; padding: 10px 15px; font-size: 14px;">Admin Login</button>
+
+  <!-- Logo and Heading -->
   <img src="logo.png" style="width:300px;"><br>
   <h1>Student Dashboard</h1>
+
+  <!-- UG Search Bar -->
   <input id="ug" placeholder="UG Number"><br><br>
   <button onclick="search()">Search</button>
+
+  <!-- Result Display -->
   <div id="result" style="margin-top:20px;"></div>
+
+  <!-- Footer -->
   <footer style="margin-top:30px;">Created by Akash Patil & Guided by Mohit Kumar Rathod</footer>
 
+  <!-- JavaScript -->
   <script>
     async function search() {
       const ug = document.getElementById("ug").value.trim();
