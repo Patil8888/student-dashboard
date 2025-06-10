@@ -4,17 +4,15 @@
 <body style="background:black; color:white; text-align:center; padding:30px;">
   <img src="logo.png" style="width:300px;"><br>
   <h1>Student Dashboard</h1>
-  <input id="enroll" placeholder="Enrollment Number"><br>
-  <input id="ug" placeholder="UG Number"><br>
+  <input id="ug" placeholder="UG Number"><br><br>
   <button onclick="search()">Search</button>
   <div id="result" style="margin-top:20px;"></div>
   <footer style="margin-top:30px;">Created by Akash Patil & Guided by Mohit Kumar Rathod</footer>
 
   <script>
     async function search() {
-      const enroll = document.getElementById("enroll").value.trim();
       const ug = document.getElementById("ug").value.trim();
-      const res = await fetch(`/search?enroll=${enroll}&ug=${ug}`);
+      const res = await fetch(`/search?enroll=&ug=${ug}`);
       const data = await res.json();
       const out = document.getElementById("result");
 
@@ -31,7 +29,3 @@
   </script>
 </body>
 </html>
-
-
-
-
