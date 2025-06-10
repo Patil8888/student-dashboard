@@ -1,50 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Student Dashboard</title>
-<style>
-  body { background: black; color: white; font-family: Arial; text-align: center; padding: 30px; }
-  .logo { width: 300px; margin: auto; display: block; }
-  input, button { margin: 10px; padding: 10px; width: 250px; }
-  #student-info { margin-top: 30px; font-size: 16px; text-align: left; display: inline-block; }
-</style>
-</head>
-<body>
-  <img src="Parul_University_LOGO-removebg-preview.png" class="logo"><br>
+<html>
+<head><title>Student Dashboard</title></head>
+<body style="background:black; color:white; text-align:center; padding:30px;">
+  <img src="logo.png" style="width:300px;"><br>
   <h1>Student Dashboard</h1>
-  <input type="text" id="enroll" placeholder="Enter Enrollment Number"><br>
-  <input type="text" id="ug" placeholder="Enter UG Number"><br>
+  <input id="enroll" placeholder="Enrollment Number"><br>
+  <input id="ug" placeholder="UG Number"><br>
   <button onclick="search()">Search</button>
-
-  <div id="student-info"></div>
-  <footer style="margin-top:40px;">Created by Akash Patil &amp; Guided by Mohit Kumar Rathod</footer>
+  <div id="result" style="margin-top:20px;"></div>
+  <footer style="margin-top:30px;">Created by Akash Patil & Guided by Mohit Kumar Rathod</footer>
 
   <script>
-    const studentData = JSON.parse(localStorage.getItem("studentData") || "[]");
-    function sanitize(s) { return (s||"").toString().trim().replace(/\s+/g," ").toLowerCase(); }
+    async function search() {
+      const enroll = document.getElementById("enroll").value.trim();
+      const ug = document.getElementById("ug").value.trim();
+      const res = await fetch(`/search?enroll=${enroll}&ug=${ug}`);
+      const data = await res.json();
+      const out = document.getElementById("result");
 
-    function search() {
-      const en = sanitize(document.getElementById("enroll").value);
-      const ug = sanitize(document.getElementById("ug").value);
-      const result = studentData.find(r =>
-        sanitize(r["ENROLLMENT NO."] || r["EnrollmentNumber"] || "") === en ||
-        sanitize(r["UG Number"] || r["UGNumber"] || "") === ug
-      );
-
-      const out = document.getElementById("student-info");
-      if (result) {
-        out.innerHTML = "<h2>Details:</h2><ul>" + 
-          Object.entries(result)
-          .map(([k,v]) => `<li><b>${k}:</b> ${v}</li>`).join("") +
-          "</ul>";
-      } else {
+      if (Object.keys(data).length === 0) {
         out.textContent = "No student found.";
+      } else {
+        out.innerHTML = "<h3>Details</h3><ul>" +
+          Object.entries(data)
+            .map(([k, v]) => `<li><b>${k}</b>: ${v}</li>`)
+            .join("") +
+          "</ul>";
       }
     }
   </script>
 </body>
 </html>
+
 
 
 
