@@ -2,22 +2,49 @@
 <html>
 <head>
   <title>Student Dashboard</title>
+  <style>
+    body {
+      background: black;
+      color: white;
+      text-align: center;
+      padding: 30px;
+      font-family: Arial, sans-serif;
+    }
+    .admin-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 10px 15px;
+      font-size: 14px;
+    }
+    table {
+      margin: auto;
+      margin-top: 20px;
+      border-collapse: collapse;
+      width: 80%;
+      color: white;
+    }
+    th, td {
+      border: 1px solid white;
+      padding: 8px 12px;
+    }
+    th {
+      background-color: #333;
+    }
+  </style>
 </head>
-<body style="background:black; color:white; text-align:center; padding:30px;">
+<body>
 
   <!-- Admin Login Button -->
-  <button onclick="window.location.href='login.html'" style="position: absolute; top: 20px; right: 20px; padding: 10px 15px; font-size: 14px;">Admin Login</button>
+  <button onclick="window.location.href='login.html'" class="admin-btn">Admin Login</button>
 
   <!-- Logo and Heading -->
-  <img src="logo.png" style="width:300px;"><br>
+  <img src="logo.png" style="width:450px;"><br>
   <h1>Student Dashboard</h1>
 
   <!-- UG Search Bar -->
   <input id="ug" placeholder="UG Number"><br><br>
   <button onclick="search()">Search</button>
-
-  <!-- Result Display -->
-  <div id="result" style="margin-top:20px;"></div>
 
   <!-- Footer -->
   <footer style="margin-top:30px;">Created by Akash Patil & Guided by Mohit Kumar Rathod</footer>
@@ -28,18 +55,15 @@
       const ug = document.getElementById("ug").value.trim();
       const res = await fetch(`/search?enroll=&ug=${ug}`);
       const data = await res.json();
-      const out = document.getElementById("result");
 
       if (Object.keys(data).length === 0) {
-        out.textContent = "No student found.";
+        alert("No student found.");
       } else {
-        out.innerHTML = "<h3>Details</h3><ul>" +
-          Object.entries(data)
-            .map(([k, v]) => `<li><b>${k}</b>: ${v}</li>`)
-            .join("") +
-          "</ul>";
+        const query = encodeURIComponent(JSON.stringify(data));
+        window.open(`result.html?data=${query}`, '_blank');
       }
     }
   </script>
 </body>
 </html>
+
